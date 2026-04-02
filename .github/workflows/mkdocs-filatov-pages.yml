@@ -1,0 +1,58 @@
+# Сборка и публикация MkDocs: students/K3339/Filatov_Arseny → GitHub Pages.
+# В настройках репозитория: Settings → Pages → Build and deployment → Source: GitHub Actions.
+name: Deploy MkDocs (Filatov K3339)
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "students/K3339/Filatov_Arseny/docs/**"
+      - "students/K3339/Filatov_Arseny/mkdocs.yml"
+      - ".github/workflows/mkdocs-filatov-pages.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages-filatov-K3339"
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install MkDocs
+        run: pip install mkdocs
+
+      - name: site_url для подкаталога GitHub Pages
+        working-directory: students/K3339/Filatov_Arseny
+        run: |
+          echo "" >> mkdocs.yml
+          echo 'site_url: "https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/"' >> mkdocs.yml
+
+      - name: Build
+        working-directory: students/k3339/Filatov_Arseny
+        run: mkdocs build --strict
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: students/K3339/Filatov_Arseny/site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - id: deploy
+        uses: actions/deploy-pages@v4
