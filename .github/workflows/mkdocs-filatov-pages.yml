@@ -1,6 +1,4 @@
-# Сборка и публикация MkDocs: students/K3339/Filatov_Arseny → GitHub Pages.
-# В настройках репозитория: Settings → Pages → Build and deployment → Source: GitHub Actions.
-name: Deploy MkDocs (Filatov K3339)
+name: Deploy MkDocs
 
 on:
   push:
@@ -40,7 +38,7 @@ jobs:
           echo 'site_url: "https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/"' >> mkdocs.yml
 
       - name: Build
-        working-directory: students/k3339/Filatov_Arseny
+        working-directory: students/K3339/Filatov_Arseny
         run: mkdocs build --strict
 
       - uses: actions/upload-pages-artifact@v3
