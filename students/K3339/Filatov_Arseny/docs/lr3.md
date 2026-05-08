@@ -16,8 +16,8 @@
 |--------|----------------|------------|
 | `db` | `postgres:16-alpine` | Общая БД Ledger + таблица результатов парсинга |
 | `redis` | `redis:7-alpine` | Брокер и backend результатов Celery |
-| `parser` | `parser_service` + `docker/parser.Dockerfile` | Микросервис FastAPI: загрузка HTML, извлечение `<title>`, `INSERT` в `lr2_parsed_web_title` |
-| `api` | `practice_1_3` + `docker/api.Dockerfile` | Основное приложение: миграции Alembic при старте, `uvicorn` |
+| `parser` | Контекст `parser_service/`, файл `Dockerfile` | Микросервис FastAPI: загрузка HTML, извлечение `<title>`, `INSERT` в `lr2_parsed_web_title` |
+| `api` | Контекст `Lr1/practice_1_3`, файл `Dockerfile` | Основное приложение: миграции Alembic при старте, `uvicorn` |
 | `celery-worker` | тот же образ, что и `api` | `celery -A app.bootstrap_celery:celery_app worker` |
 
 Сеть и зависимости задаются в Compose: API и воркер знают `PARSER_SERVICE_URL=http://parser:8100`, Redis — по имени сервиса `redis`, БД — `db`.
@@ -30,7 +30,7 @@
 
 ### Dockerfile API
 
-`Lr3/docker/api.Dockerfile`: базовый `python:3.12-slim`, зависимости из `practice_1_3/requirements.txt`, команда по умолчанию — `alembic upgrade head` и запуск `uvicorn`. Образ переиспользуется сервисом `celery-worker` с другим `command`.
+`Lr1/practice_1_3/Dockerfile`: базовый `python:3.12-slim`, зависимости из того же каталога `requirements.txt`, команда по умолчанию — `alembic upgrade head` и запуск `uvicorn`. Образ переиспользуется сервисом `celery-worker` с другим `command`.
 
 ---
 
@@ -72,19 +72,3 @@ docker compose up --build
 ```
 
 Далее в Swagger Ledger (`/docs`): вызвать `/integrations/parser/sync` и `/integrations/parser/async`, для async — опросить `/integrations/parser/async/{task_id}`.
-
----
-
-## Зависимости в `practice_1_3`
-
-Добавлены пакеты: **httpx**, **celery[redis]**, **redis** (см. `requirements.txt`).
-
----
-
-## Ссылки по теме (из задания)
-
-- [Основы Docker (Tproger)](https://tproger.ru/translations/docker-for-beginners/)
-- [Документация Dockerfile](https://docs.docker.com/reference/dockerfile/)
-- [Документация Docker Compose](https://docs.docker.com/compose/)
-- [Celery — документация](https://docs.celeryq.dev/en/stable/)
-- [Redis](https://redis.io/docs/)

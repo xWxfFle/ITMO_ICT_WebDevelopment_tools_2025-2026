@@ -5,18 +5,20 @@
 | Компонент | Расположение |
 |-----------|--------------|
 | **Docker Compose** | `docker-compose.yml` — PostgreSQL, Redis, Ledger API, микросервис парсера, Celery worker |
-| **Dockerfile API** | `docker/api.Dockerfile` (контекст — `Lr1/practice_1_3`) |
-| **Dockerfile парсера** | `docker/parser.Dockerfile` (контекст — `parser_service/`) |
+| **Dockerfile API** | `../Lr1/practice_1_3/Dockerfile` |
+| **Dockerfile парсера** | `parser_service/Dockerfile` |
 | **Микросервис парсера** | `parser_service/` — FastAPI, `POST /parse`, запись в `lr2_parsed_web_title` |
 | **Интеграция в Ledger** | `Lr1/practice_1_3/app/api/routers/parser_integration.py`, Celery в `app/celery_app.py`, задачи в `app/tasks/parse_tasks.py`, вход воркера `app/bootstrap_celery.py` |
 
 ## Быстрый старт
 
-Из каталога `Lr3`:
+Из каталога **`Lr3`** (рядом с `parser_service/` и `docker-compose.yml`):
 
 ```bash
 docker compose up --build
 ```
+
+Запускайте только через **`docker compose`**, чтобы все сервисы оказались в общей сети `filatov_lr3_net` и хост **`lr3-postgres`** / **`db`** резолвился. Если поднять только образ `docker run ...` без этой сети, Postgres по имени недоступен.
 
 После старта:
 
