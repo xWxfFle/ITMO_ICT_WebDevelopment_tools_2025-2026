@@ -4,7 +4,7 @@
 
 Упаковать Ledger (ЛР1) и парсер (логика ЛР2) в контейнеры, вызывать парсер по HTTP из FastAPI и (на максимальный балл) ставить парсинг в фон через **Celery** и **Redis**.
 
-Код и артефакты: каталог **[`Lr3/`](../Lr3/)** (рядом с `Lr1/`, `Lr2/`, `docs/`).
+Код и артефакты: каталог **`Lr3/`** в репозитории (`students/K3339/Filatov_Arseny/Lr3/`), рядом с **`Lr1/`**, **`Lr2/`** и папкой **`docs/`**.
 
 ---
 
@@ -36,7 +36,7 @@
 
 ## Подзадача 2 — вызов парсера из Ledger
 
-Роутер [`parser_integration.py`](../Lr1/practice_1_3/app/api/routers/parser_integration.py):
+Роутер интеграции — файл **`parser_integration.py`** в дереве приложения Ledger: `students/K3339/Filatov_Arseny/Lr1/practice_1_3/app/api/routers/parser_integration.py`:
 
 | Метод | Путь | Поведение |
 |-------|------|-----------|
