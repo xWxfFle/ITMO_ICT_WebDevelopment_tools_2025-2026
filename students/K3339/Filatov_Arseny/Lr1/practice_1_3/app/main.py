@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 
-from app.api.routers import auth, categories, tags, transactions, users, wallets
+from app.api.routers import auth, categories, parser_integration, tags, transactions, users, wallets
 
 app = FastAPI(
     title="Ledger API — practice 1.3",
@@ -14,8 +14,9 @@ app.include_router(wallets.router)
 app.include_router(categories.router)
 app.include_router(tags.router)
 app.include_router(transactions.router)
+app.include_router(parser_integration.router)
 
 
 @app.get("/")
 def root() -> str:
-    return "Ledger API — practice 1.3 (Alembic + JWT)"
+    return "Ledger API — practice 1.3 (Alembic + JWT + LR3 парсер)"

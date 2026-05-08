@@ -1,0 +1,86 @@
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ledger
+      POSTGRES_PASSWORD: ledger
+      POSTGRES_DB: ledger
+    ports:
+      - "5432:5432"
+    volumes:
+      - ledger_pg:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ledger -d ledger"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+
+  parser:
+    build:
+      context: ./parser_service
+      dockerfile: docker/parser.Dockerfile
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql://ledger:ledger@db:5432/ledger
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8100:8100"
+
+  api:
+    build:
+      context: ../Lr1/practice_1_3
+      dockerfile: docker/api.Dockerfile
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql://ledger:ledger@db:5432/ledger
+      SECRET_KEY: docker-dev-secret-change-me
+      PARSER_SERVICE_URL: http://parser:8100
+      CELERY_BROKER_URL: redis://redis:6379/0
+      CELERY_RESULT_BACKEND: redis://redis:6379/1
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+      parser:
+        condition: service_started
+    ports:
+      - "8000:8000"
+
+  celery-worker:
+    build:
+      context: ../Lr1/practice_1_3
+      dockerfile: docker/api.Dockerfile
+    restart: unless-stopped
+    command:
+      [
+        "celery",
+        "-A",
+        "app.bootstrap_celery:celery_app",
+        "worker",
+        "--loglevel=info",
+      ]
+    environment:
+      DATABASE_URL: postgresql://ledger:ledger@db:5432/ledger
+      PARSER_SERVICE_URL: http://parser:8100
+      CELERY_BROKER_URL: redis://redis:6379/0
+      CELERY_RESULT_BACKEND: redis://redis:6379/1
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+      parser:
+        condition: service_started
+
+volumes:
+  ledger_pg:
